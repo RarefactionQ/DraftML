@@ -8,6 +8,7 @@ from IPython.display import Image
 from sklearn.externals.six import StringIO
 
 from feature_extractors.hero_feature_extractor import HeroFeatureExtractor
+from feature_extractors.hero_set_feature_extractor import HeroSetFeatureExtractor
 
 INPUT_FILE_DEFAULT = 'draft.txt'
 OUTPUT_FEATURE_FILE_DEFAULT = 'Proto.csv'
@@ -44,8 +45,8 @@ def buildExamples(input_file, output_file):
 
 		features = list()
 		feature_names = list()
-		hfe = HeroFeatureExtractor()
 
+		hfe = HeroFeatureExtractor()
 		for index, hero in enumerate(radiant_bans):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["radiant_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
@@ -58,6 +59,16 @@ def buildExamples(input_file, output_file):
 		for index, hero in enumerate(dire_picks):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["dire_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+
+		hsfe = HeroSetFeatureExtractor()
+		features.extend(hsfe.extract(radiant_picks))
+		feature_names.extend(["radiant_picks_%s" % x for x in hsfe.extractFeatureNames()])
+		features.extend(hsfe.extract(radiant_bans))
+		feature_names.extend(["radiant_bans_%s" % x for x in hsfe.extractFeatureNames()])
+		features.extend(hsfe.extract(dire_picks))
+		feature_names.extend(["dire_picks_%s" % x for x in hsfe.extractFeatureNames()])
+		features.extend(hsfe.extract(dire_bans))
+		feature_names.extend(["dire_bans_%s" % x for x in hsfe.extractFeatureNames()])
 
 		w.write(",".join(str(x) for x in features))
 		w.write('\n')
