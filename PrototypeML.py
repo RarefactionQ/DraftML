@@ -55,8 +55,8 @@ def buildExamples(input_file, output_file):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["radiant_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
 			names = zip(feature_names,features)
-			for name in names:
-			 	print str(name[0])+" "+str(name[1])
+			# for name in names:
+			#  	print str(name[0])+" "+str(name[1])
 		for index, hero in enumerate(dire_bans):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["dire_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
@@ -111,7 +111,7 @@ def doDecisionTree(train, test, feature_names_file):
 	results = zip(precog,test[1])
 	correct = 0
 	for result in results:
-	 	print "Predicted"+" "+str(result[0])+" actual:"+str(result[1])
+	 	# print "Predicted"+" "+str(result[0])+" actual:"+str(result[1])
 	 	if result[0] == precog[1]:
 	 		correct += 1
 
