@@ -48,8 +48,8 @@ def buildExamples(input_file, output_file):
 	w.close()
 
 
-def doML(output_file):
-	dataset = np.genfromtxt(output_file, delimiter = ',')
+def getExamples(from_file):
+	dataset = np.genfromtxt(from_file, delimiter = ',')
 	# print (dataset.shape)
 	X = dataset[:,1:-1] #Rest of attributes
 	y = dataset[:,0] #Target
@@ -71,6 +71,9 @@ def doML(output_file):
 	alphas = np.logspace(-4, -1, 6)
 	# alphas = np.logspace(-4, -1, 6)
 
+	return ((X_train, y_train), (X_test, y_test))
+
+def doDecisionTree(train, test):	
 	# regr = linear_model.Lasso()
 	# scores = [regr.set_params(alpha=alpha).fit(X_train, y_train).score(X_test, y_test) for alpha in alphas]
 	# best_alpha = alphas[scores.index(max(scores))]
@@ -79,7 +82,7 @@ def doML(output_file):
 	# print(regr.coef_)
 
 	clf = tree.DecisionTreeClassifier()
-	clf = clf.fit(X_train, y_train)
+	clf = clf.fit(train[0], train[1])
 
 	# for x in X_train:
 	# 	print x
@@ -88,9 +91,9 @@ def doML(output_file):
 
 	with open("Proto.dot", 'w') as f:
 		f = tree.export_graphviz(clf, feature_names=["first","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21"],  
-	                         class_names=["Dire","Radiant"],  
-	                         filled=True, rounded=True,  
-	                         special_characters=True, out_file=f)
+							class_names=["Dire","Radiant"],  
+							filled=True, rounded=True,  
+							special_characters=True, out_file=f)
 	
 
 def main():
@@ -102,7 +105,8 @@ def main():
 	args = parser.parse_args()
 
 	buildExamples(input_file=args.input_file, output_file=args.output_file)
-	doML(output_file=args.output_file)
+	train, test = getExamples(args.output_file)
+	doDecisionTree(train, test)
 
 
 if __name__ == "__main__":
