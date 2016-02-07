@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import datasets, svm, linear_model
+from sklearn import datasets, svm, linear_model, tree
+from IPython.display import Image
+from sklearn.externals.six import StringIO
 
 hero_list = ['Abaddon','Alchemist','Ancient Apparition','Anti Mage','Arc Warden','Axe','Bane','Batrider','Beastmaster','Bloodseeker','Bounty Hunter','Brewmaster','Bristleback','Broodmother','Centaur Warrunner','Chaos Knight','Chen','Clinkz','Clockwerk','Crystal Maiden','Dark Seer','Dazzle','Death Prophet','Disruptor','Doom','Dragon Knight','Drow Ranger','Earth Spirit','Earthshaker','Elder Titan','Ember Spirit','Enchantress','Enigma','Faceless Void','Gyrocopter','Huskar','Invoker','Io','Jakiro','Juggernaut','Keeper of the Light','Kunkka','Legion Commander','Leshrac','Lich','Lifestealer','Lina','Lion','Lone Druid','Luna','Lycan','Magnus','Medusa','Meepo','Mirana','Morphling','Naga Siren','Natures Prophet','Necrophos','Night Stalker','Nyx Assassin','Ogre Magi','Omniknight','Oracle','Outworld Devourer','Phantom Assassin','Phantom Lancer','Phoenix','Pit Lord','Puck','Pudge','Pugna','Queen of Pain','Razor','Riki','Rubick','Sand King','Shadow Demon','Shadow Fiend','Shadow Shaman','Silencer','Skywrath Mage','Slardar','Slark','Sniper','Spectre','Spirit Breaker','Storm Spirit','Sven','Techies','Templar Assassin','Terrorblade','Tidehunter','Timbersaw','Tinker','Tiny','Treant Protector','Troll Warlord','Tusk','Undying','Ursa','Vengeful Spirit','Venomancer','Viper','Visage','Warlock','Weaver','Windranger','Winter Wyvern','Witch Doctor','Wraith King','Zeus']
 
@@ -79,11 +81,22 @@ y_train = y[:.9 * n_sample]
 X_test = X[.9 * n_sample:]
 y_test = y[.9 * n_sample:]
 
-alphas = np.logspace(-4, -1, 6)
+# alphas = np.logspace(-4, -1, 6)
 
-regr = linear_model.Lasso()
-scores = [regr.set_params(alpha=alpha).fit(X_train, y_train).score(X_test, y_test) for alpha in alphas]
-best_alpha = alphas[scores.index(max(scores))]
-regr.alpha = best_alpha
-print regr.fit(X_train, y_train)
-print(regr.coef_)
+# regr = linear_model.Lasso()
+# scores = [regr.set_params(alpha=alpha).fit(X_train, y_train).score(X_test, y_test) for alpha in alphas]
+# best_alpha = alphas[scores.index(max(scores))]
+# regr.alpha = best_alpha
+# print regr.fit(X_train, y_train)
+# print(regr.coef_)
+
+clf = tree.DecisionTreeClassifier()
+clf = clf.fit(X_train, y_train)
+
+# for x in X_train:
+# 	print x
+# for y in y_train:
+# 	print y
+
+with open("Proto.dot", 'w') as f:
+	f = tree.export_graphviz(clf, out_file=f)
