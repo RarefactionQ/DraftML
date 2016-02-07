@@ -11,27 +11,13 @@ from feature_extractors.hero_feature_extractor import HeroFeatureExtractor
 INPUT_FILE_DEFAULT = 'draft.txt'
 OUTPUT_FEATURE_FILE_DEFAULT = 'Proto.csv'
 
-def order_to_index(n):
-	return 3 + (n-1) * 5
-
-
 def buildExamples(input_file, output_file):
 	f = open(input_file, 'r+')
 	w = open(output_file, 'w')
 	draft_list = f.read().split('\n')
-	# for elem in draft_list:
-		# print elem
-	# print len(draft_list)
+
 	for draft in draft_list:
 		attributes = draft.split(',')
-		# print len(attributes)
-		# if len(attributes) != 102:
-		# 	for attr in attributes:
-		# 		print attr
-
-		# for attr in attributes:
-			# print attr
-		# break
 
 		w.write(attributes[0]+'.,') #winner
 		if attributes[5] == 'Radiant':
@@ -74,11 +60,8 @@ def buildExamples(input_file, output_file):
 
 def getExamples(from_file):
 	dataset = np.genfromtxt(from_file, delimiter = ',')
-	# print (dataset.shape)
 	X = dataset[:,1:-1] #Rest of attributes
 	y = dataset[:,0] #Target
-
-	# print X.shape[1]
 
 	n_sample = len(X) # from plot_iris_exercise.py
 
@@ -92,29 +75,15 @@ def getExamples(from_file):
 	X_test = X[.9 * n_sample:]
 	y_test = y[.9 * n_sample:]
 
-	alphas = np.logspace(-4, -1, 6)
-	# alphas = np.logspace(-4, -1, 6)
-
 	return ((X_train, y_train), (X_test, y_test))
 
-def doDecisionTree(train, test):	
-	# regr = linear_model.Lasso()
-	# scores = [regr.set_params(alpha=alpha).fit(X_train, y_train).score(X_test, y_test) for alpha in alphas]
-	# best_alpha = alphas[scores.index(max(scores))]
-	# regr.alpha = best_alpha
-	# print regr.fit(X_train, y_train)
-	# print(regr.coef_)
 
+def doDecisionTree(train, test):
 	clf = tree.DecisionTreeClassifier()
 	clf = clf.fit(train[0], train[1])
 
-	# for x in X_train:
-	# 	print x
-	# for y in y_train:
-	# 	print y
-
 	with open("Proto.dot", 'w') as f:
-		f = tree.export_graphviz(clf, feature_names=["first","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21"],  
+		f = tree.export_graphviz(clf, feature_names=range(0, len(train[0])),  
 							class_names=["Dire","Radiant"],  
 							filled=True, rounded=True,  
 							special_characters=True, out_file=f)
