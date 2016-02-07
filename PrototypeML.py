@@ -96,17 +96,31 @@ def doDecisionTree(train, test):
 							special_characters=True, out_file=f)
 	
 
+def doLogisticRegression(train, test):
+	lr = linear_model.LogisticRegression()
+	lr.fit(train[0], train[1])
+	print "Average performance: %s" % lr.score(test[0], test[1])
+
+
 def main():
 	parser = argparse.ArgumentParser(description='Predict some Dota winners.')
 	parser.add_argument('-i', '--input_file', type=str, default=INPUT_FILE_DEFAULT,
 					help='File to read example matches from')
 	parser.add_argument('-o', '--output_file', type=str, default=OUTPUT_FEATURE_FILE_DEFAULT,
 					help='File to output extracted features to')
+	parser.add_argument('-m', '--model', type=str,
+					help='Model to use for predictions')
 	args = parser.parse_args()
 
 	buildExamples(input_file=args.input_file, output_file=args.output_file)
 	train, test = getExamples(args.output_file)
-	doDecisionTree(train, test)
+
+	if args.model == "lr":
+		doLogisticRegression(train, test)
+	elif args.model == "dt":
+		doDecisionTree(train, test)
+	else:
+		doDecisionTree(train, test)
 
 
 if __name__ == "__main__":
