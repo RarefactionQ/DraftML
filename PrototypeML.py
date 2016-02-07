@@ -62,8 +62,9 @@ def buildExamples(input_file, output_file):
 		heroes.extend(dire_picks)
 
 		features = list()
+		hfe = HeroFeatureExtractor()
 		for hero in heroes:
-			features.extend(HeroFeatureExtractor.extract(hero))
+			features.extend(hfe.extract(hero))
 
 		w.write(",".join(str(x) for x in features))
 		w.write('\n')
