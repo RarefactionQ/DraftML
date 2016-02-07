@@ -1,4 +1,5 @@
 import argparse
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -41,21 +42,31 @@ def buildExamples(input_file, output_file):
 		dire_bans = [attributes[hero_pick_indexes[x-1]] for x in dire_ban_orders]
 		dire_picks = [attributes[hero_pick_indexes[x-1]] for x in dire_pick_orders]
 
-		heroes = list()
-		heroes.extend(radiant_bans)
-		heroes.extend(radiant_picks)
-		heroes.extend(dire_bans)
-		heroes.extend(dire_picks)
-
 		features = list()
+		feature_names = list()
 		hfe = HeroFeatureExtractor()
-		for hero in heroes:
+
+		for index, hero in enumerate(radiant_bans):
 			features.extend(hfe.extract(hero))
+			feature_names.extend(["radiant_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+		for index, hero in enumerate(radiant_picks):
+			features.extend(hfe.extract(hero))
+			feature_names.extend(["radiant_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+		for index, hero in enumerate(dire_bans):
+			features.extend(hfe.extract(hero))
+			feature_names.extend(["dire_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+		for index, hero in enumerate(dire_picks):
+			features.extend(hfe.extract(hero))
+			feature_names.extend(["dire_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
 
 		w.write(",".join(str(x) for x in features))
 		w.write('\n')
 
 	w.close()
+
+	with open("features_" + output_file, 'w') as w:
+		w.write(",".join(feature_names))
+		w.close()
 
 
 def getExamples(from_file):
@@ -77,8 +88,7 @@ def getExamples(from_file):
 
 	return ((X_train, y_train), (X_test, y_test))
 
-
-def doDecisionTree(train, test):
+def doDecisionTree(train, test, feature_names_file):	
 	clf = tree.DecisionTreeClassifier()
 	clf = clf.fit(train[0], train[1])
 
@@ -96,9 +106,12 @@ def doDecisionTree(train, test):
 	accuracy = float(correct) / float(i)
 	print "Total accuracy: "+str(accuracy)
 
+	with open(feature_names_file, 'r') as f:
+		reader = csv.reader(f)
+		feature_names = reader.next()
 
 	with open("Proto.dot", 'w') as f:
-		f = tree.export_graphviz(clf, feature_names=range(0, len(train[0])),  
+		f = tree.export_graphviz(clf, feature_names=feature_names,  
 							class_names=["Dire","Radiant"],  
 							filled=True, rounded=True,  
 							special_characters=True, out_file=f)
@@ -126,9 +139,9 @@ def main():
 	if args.model == "lr":
 		doLogisticRegression(train, test)
 	elif args.model == "dt":
-		doDecisionTree(train, test)
+		doDecisionTree(train, test, "features_" + args.output_file)
 	else:
-		doDecisionTree(train, test)
+		doDecisionTree(train, test, "features_" + args.output_file)
 
 
 if __name__ == "__main__":
