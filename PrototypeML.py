@@ -11,6 +11,10 @@ from feature_extractors.hero_feature_extractor import HeroFeatureExtractor
 INPUT_FILE_DEFAULT = 'draft.txt'
 OUTPUT_FEATURE_FILE_DEFAULT = 'Proto.csv'
 
+def order_to_index(n):
+	return 3 + (n-1) * 5
+
+
 def buildExamples(input_file, output_file):
 	f = open(input_file, 'r+')
 	w = open(output_file, 'w')
@@ -37,10 +41,29 @@ def buildExamples(input_file, output_file):
 		else:
 			w.write('-1.,') # this shouldn't happen
 
-		hero_pick_indexes = [3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58, 63, 68, 73, 78, 83, 88, 93, 98]
+		radiant_ban_orders = [1, 3, 9, 11, 18]
+		dire_ban_orders = [2, 4, 10, 12, 17] 
+		radiant_pick_orders = [5, 8, 14, 16, 20]
+		dire_pick_orders = [6, 7, 13, 15, 19]
+
+		offset_spaces = 3
+		attributes_per_hero = 5
+		hero_pick_indexes = [offset_spaces + x * attributes_per_hero for x in range(0, 20)]
+
+		radiant_bans = [attributes[hero_pick_indexes[x-1]] for x in radiant_ban_orders]
+		radiant_picks = [attributes[hero_pick_indexes[x-1]] for x in radiant_pick_orders]
+		dire_bans = [attributes[hero_pick_indexes[x-1]] for x in dire_ban_orders]
+		dire_picks = [attributes[hero_pick_indexes[x-1]] for x in dire_pick_orders]
+
+		heroes = list()
+		heroes.extend(radiant_bans)
+		heroes.extend(radiant_picks)
+		heroes.extend(dire_bans)
+		heroes.extend(dire_picks)
+
 		features = list()
-		for hero_pick_index in hero_pick_indexes:
-			features.extend(HeroFeatureExtractor.extract(attributes[hero_pick_index]))
+		for hero in heroes:
+			features.extend(HeroFeatureExtractor.extract(hero))
 
 		w.write(",".join(str(x) for x in features))
 		w.write('\n')
