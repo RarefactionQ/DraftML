@@ -82,6 +82,21 @@ def doDecisionTree(train, test):
 	clf = tree.DecisionTreeClassifier()
 	clf = clf.fit(train[0], train[1])
 
+	precog = clf.predict(test[0])
+	i = 0
+	correct = 0
+	# print len(precog)
+	# print len(test[1])
+	for result in test[1]:
+	 	print "Predicted"+" "+str(precog[i])+" actual:"+str(result)
+	 	if result == precog[i]:
+	 		correct+=1
+	 	i+=1
+
+	accuracy = float(correct) / float(i)
+	print "Total accuracy: "+str(accuracy)
+
+
 	with open("Proto.dot", 'w') as f:
 		f = tree.export_graphviz(clf, feature_names=range(0, len(train[0])),  
 							class_names=["Dire","Radiant"],  
