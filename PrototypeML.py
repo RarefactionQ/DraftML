@@ -97,8 +97,11 @@ def doML(output_file):
 	# for y in y_train:
 	# 	print y
 
-with open("Proto.dot", 'w') as f:
-	f = tree.export_graphviz(clf, out_file=f)
+	with open("Proto.dot", 'w') as f:
+		f = tree.export_graphviz(clf, feature_names=["first","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21"],  
+	                         class_names=["Dire","Radiant"],  
+	                         filled=True, rounded=True,  
+	                         special_characters=True, out_file=f)
 	
 
 def main():
