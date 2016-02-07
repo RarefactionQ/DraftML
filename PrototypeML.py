@@ -49,9 +49,13 @@ def buildExamples(input_file, output_file):
 		for index, hero in enumerate(radiant_bans):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["radiant_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+
 		for index, hero in enumerate(radiant_picks):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["radiant_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+			# names = zip(feature_names,features)
+			# for name in names:
+			# 	print str(name[0])+" "+str(name[1])
 		for index, hero in enumerate(dire_bans):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["dire_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
@@ -93,17 +97,14 @@ def doDecisionTree(train, test, feature_names_file):
 	clf = clf.fit(train[0], train[1])
 
 	precog = clf.predict(test[0])
-	i = 0
+	results = zip(precog,test[1])
 	correct = 0
-	# print len(precog)
-	# print len(test[1])
-	for result in test[1]:
-	 	print "Predicted"+" "+str(precog[i])+" actual:"+str(result)
-	 	if result == precog[i]:
-	 		correct+=1
-	 	i+=1
+	for result in results:
+	 	print "Predicted"+" "+str(result[0])+" actual:"+str(result[1])
+	 	if result[0] == precog[1]:
+	 		correct += 1
 
-	accuracy = float(correct) / float(i)
+	accuracy = float(correct) / float(len(results))
 	print "Total accuracy: "+str(accuracy)
 
 	with open(feature_names_file, 'r') as f:
