@@ -1,6 +1,9 @@
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import datasets, svm, linear_model
+
+from feature_extractors.hero_feature_extractor import HeroFeatureExtractor
 
 hero_list = ['Abaddon','Alchemist','Ancient Apparition','Anti Mage','Arc Warden','Axe','Bane','Batrider','Beastmaster','Bloodseeker','Bounty Hunter','Brewmaster','Bristleback','Broodmother','Centaur Warrunner','Chaos Knight','Chen','Clinkz','Clockwerk','Crystal Maiden','Dark Seer','Dazzle','Death Prophet','Disruptor','Doom','Dragon Knight','Drow Ranger','Earth Spirit','Earthshaker','Elder Titan','Ember Spirit','Enchantress','Enigma','Faceless Void','Gyrocopter','Huskar','Invoker','Io','Jakiro','Juggernaut','Keeper of the Light','Kunkka','Legion Commander','Leshrac','Lich','Lifestealer','Lina','Lion','Lone Druid','Luna','Lycan','Magnus','Medusa','Meepo','Mirana','Morphling','Naga Siren','Natures Prophet','Necrophos','Night Stalker','Nyx Assassin','Ogre Magi','Omniknight','Oracle','Outworld Devourer','Phantom Assassin','Phantom Lancer','Phoenix','Pit Lord','Puck','Pudge','Pugna','Queen of Pain','Razor','Riki','Rubick','Sand King','Shadow Demon','Shadow Fiend','Shadow Shaman','Silencer','Skywrath Mage','Slardar','Slark','Sniper','Spectre','Spirit Breaker','Storm Spirit','Sven','Techies','Templar Assassin','Terrorblade','Tidehunter','Timbersaw','Tinker','Tiny','Treant Protector','Troll Warlord','Tusk','Undying','Ursa','Vengeful Spirit','Venomancer','Viper','Visage','Warlock','Weaver','Windranger','Winter Wyvern','Witch Doctor','Wraith King','Zeus']
 
@@ -14,7 +17,7 @@ for hero in hero_list:
 # 	print str(hero_dict[key])+' '+key
 
 f = open('draft.txt', 'r+')
-w = open('Proto.csv', 'r+')
+w = open('Proto.csv', 'w')
 draft_list = f.read().split('\n')
 # for elem in draft_list:
 	# print elem
@@ -37,26 +40,13 @@ for draft in draft_list:
 		w.write('0.,')
 	else:
 		w.write('-1.,') # this shouldn't happen
-	w.write(str(hero_dict[attributes[3]])+'.,') #1st ban
-	w.write(str(hero_dict[attributes[8]])+'.,') #2nd ban
-	w.write(str(hero_dict[attributes[13]])+'.,') #3rd ban
-	w.write(str(hero_dict[attributes[18]])+'.,') #4th ban
-	w.write(str(hero_dict[attributes[23]])+'.,') #1st pick
-	w.write(str(hero_dict[attributes[28]])+'.,') #2nd pick
-	w.write(str(hero_dict[attributes[33]])+'.,') #3rd pick
-	w.write(str(hero_dict[attributes[38]])+'.,') #4th pick
-	w.write(str(hero_dict[attributes[43]])+'.,') #5th ban
-	w.write(str(hero_dict[attributes[48]])+'.,') #6th ban
-	w.write(str(hero_dict[attributes[53]])+'.,') #7th ban
-	w.write(str(hero_dict[attributes[58]])+'.,') #8th ban
-	w.write(str(hero_dict[attributes[63]])+'.,') #5th pick
-	w.write(str(hero_dict[attributes[68]])+'.,') #6th pick
-	w.write(str(hero_dict[attributes[73]])+'.,') #7th pick
-	w.write(str(hero_dict[attributes[78]])+'.,') #8th pick
-	w.write(str(hero_dict[attributes[83]])+'.,') #9th ban
-	w.write(str(hero_dict[attributes[88]])+'.,') #10th ban
-	w.write(str(hero_dict[attributes[93]])+'.,') #9th pick
-	w.write(str(hero_dict[attributes[98]])+'.,') #10th pick
+
+	hero_pick_indexes = [3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58, 63, 68, 73, 78, 83, 88, 93, 98]
+	features = list()
+	for hero_pick_index in hero_pick_indexes:
+		features.extend(HeroFeatureExtractor.extract(attributes[hero_pick_index]))
+
+	w.write(",".join(str(x) for x in features))
 	w.write('\n')
 
 w.close()
