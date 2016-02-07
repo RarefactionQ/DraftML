@@ -43,7 +43,7 @@ class HeroFeatureExtractor(object):
         return features
 
     def getHeroFarmPriority(self, hero_name_str):
-        return [float(n) for n in self.farm_priorities[hero_name_str][1:]]
+        return [float(n) for n in self.farm_priorities[hero_name_str][0:]]
 
     def getHeroFarmPriorityNames(self):
         return self.farm_priorities["names"][1:]
@@ -52,5 +52,5 @@ class HeroFeatureExtractor(object):
         return [float(n) for n in self.hero_stats[hero_name_str][1:]]
 
     def getHeroStatsNames(self):
-        return self.hero_stats["names"][1:]
+        return self.hero_stats["names"][2:]
 
