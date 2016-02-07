@@ -53,9 +53,9 @@ def buildExamples(input_file, output_file):
 		for index, hero in enumerate(radiant_picks):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["radiant_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
-			# names = zip(feature_names,features)
-			# for name in names:
-			# 	print str(name[0])+" "+str(name[1])
+			names = zip(feature_names,features)
+			for name in names:
+			 	print str(name[0])+" "+str(name[1])
 		for index, hero in enumerate(dire_bans):
 			features.extend(hfe.extract(hero))
 			feature_names.extend(["dire_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
