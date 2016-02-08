@@ -9,6 +9,7 @@ from sklearn.externals.six import StringIO
 
 from feature_extractors.hero_feature_extractor import HeroFeatureExtractor
 from feature_extractors.hero_set_feature_extractor import HeroSetFeatureExtractor
+from feature_extractors.oracle_feature_extractor import OracleFeatureExtractor
 
 INPUT_FILE_DEFAULT = 'draft.txt'
 OUTPUT_FEATURE_FILE_DEFAULT = 'Proto.csv'
@@ -21,13 +22,18 @@ def buildExamples(input_file, output_file):
 	for draft in draft_list:
 		attributes = draft.split(',')
 
-		w.write(attributes[0]+'.,') #winner
+		w.write("%s.0," % attributes[0]) #winner
+
+		features = list()
+		feature_names = list()
+
+		feature_names.append("Who Went First")
 		if attributes[5] == 'Radiant':
-			w.write('1.,')
+			features.append(1.0)
 		elif attributes[5] == 'Dire':
-			w.write('0.,')
+			features.append(0.0)
 		else:
-			w.write('-1.,') # this shouldn't happen
+			features.append(-1.0)
 
 		radiant_ban_orders = [1, 3, 9, 11, 18]
 		dire_ban_orders = [2, 4, 10, 12, 17] 
@@ -42,9 +48,6 @@ def buildExamples(input_file, output_file):
 		radiant_picks = [attributes[hero_pick_indexes[x-1]] for x in radiant_pick_orders]
 		dire_bans = [attributes[hero_pick_indexes[x-1]] for x in dire_ban_orders]
 		dire_picks = [attributes[hero_pick_indexes[x-1]] for x in dire_pick_orders]
-
-		features = list()
-		feature_names = list()
 
 		hfe = HeroFeatureExtractor()
 		for index, hero in enumerate(radiant_bans):
@@ -74,6 +77,10 @@ def buildExamples(input_file, output_file):
 		features.extend(hsfe.extract(dire_bans))
 		feature_names.extend(["dire_bans_%s" % x for x in hsfe.extractFeatureNames()])
 
+		ofe = OracleFeatureExtractor()
+		features.extend(ofe.extract(int(attributes[0])))
+		feature_names.extend(ofe.extractFeatureNames())
+
 		w.write(",".join(str(x) for x in features))
 		w.write('\n')
 
@@ -86,7 +93,7 @@ def buildExamples(input_file, output_file):
 
 def getExamples(from_file):
 	dataset = np.genfromtxt(from_file, delimiter = ',')
-	X = dataset[:,1:-1] #Rest of attributes
+	X = dataset[:,1:] #Rest of attributes
 	y = dataset[:,0] #Target
 
 	n_sample = len(X) # from plot_iris_exercise.py
