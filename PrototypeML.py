@@ -112,7 +112,7 @@ def doDecisionTree(train, test, feature_names_file):
 	correct = 0
 	for result in results:
 	 	# print "Predicted"+" "+str(result[0])+" actual:"+str(result[1])
-	 	if result[0] == precog[1]:
+	 	if result[0] == result[1]:
 	 		correct += 1
 
 	accuracy = float(correct) / float(len(results))
