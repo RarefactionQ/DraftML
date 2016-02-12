@@ -49,7 +49,11 @@ class HeroFeatureExtractor(object):
         return self.farm_priorities["names"][1:]
 
     def getHeroStats(self, hero_name_str):
-        return [float(n) for n in self.hero_stats[hero_name_str][0:]]
+        try:
+            return [float(n) for n in self.hero_stats[hero_name_str][0:]]
+        except KeyError:
+            print hero_name_str
+            return [float(n) for n in self.hero_stats["Zeus"][0:]] #Zeus is a placeholder
 
     def getHeroStatsNames(self):
         return self.hero_stats["names"][1:]
