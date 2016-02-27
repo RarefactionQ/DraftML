@@ -64,3 +64,6 @@ target/
 
 # pyenv
 .python-version
+
+# Steam API Key
+apikey.txt

@@ -21,7 +21,10 @@ def buildExamples(input_file, output_file):
 
 	for draft in draft_list:
 		attributes = draft.split(',')
-
+		# print len(attributes)
+		if len(attributes) != 102: #getting rid of malformed games
+			print len(attributes)
+			continue
 		w.write("%s.0," % attributes[0]) #winner
 
 		features = list()

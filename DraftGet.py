@@ -40,12 +40,14 @@ def writeMatch(matchnum):
 	global DERP
 	if matchnum < 10000: #throwing out malformed game ids
 		return
-	winner = "Unknown"
+	winner = "U"
 	r = requests.get("http://www.datdota.com/match.php?q="+matchnum+"&p=draft")
 	soup = BeautifulSoup(r.content, 'html.parser')
 	useful = False
 	for next in soup.find_all("td"):
 		s = next.get_text()
+		if s is "":
+			continue
 		if useful == False:
 			if s == "DIRE":
 				winner = "Dire"
@@ -61,12 +63,14 @@ def writeMatch(matchnum):
 			if s != "":
 				if "\n" in s:
 					continue
-				if "Unknown".lower() in s.lower():
+				x = "Unknown"
+				if x == s:
 					DERP+=1
 					print str(DERP)
 					f.write("derp "+str(DERP)+",")
 					continue
-				f.write(s+",")
+				else: 
+					f.write(s+",")
 
 	f.write("\n")
 
