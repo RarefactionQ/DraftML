@@ -3,12 +3,13 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn import datasets, svm, linear_model, tree
+from sklearn import datasets, svm, linear_model, preprocessing, tree
 from IPython.display import Image
 from sklearn.externals.six import StringIO
 
 from feature_extractors.hero_feature_extractor import HeroFeatureExtractor
 from feature_extractors.hero_set_feature_extractor import HeroSetFeatureExtractor
+from feature_extractors.team_feature_extractor import TeamFeatureExtractor
 
 INPUT_FILE_DEFAULT = 'draft.txt'
 OUTPUT_FEATURE_FILE_DEFAULT = 'Proto.csv'
@@ -20,14 +21,22 @@ def buildExamples(input_file, output_file):
 
 	for draft in draft_list:
 		attributes = draft.split(',')
+		# print len(attributes)
+		if len(attributes) != 102: #getting rid of malformed games
+			print len(attributes)
+			continue
+		w.write("%s.0," % attributes[0]) #winner
 
-		w.write(attributes[0]+'.,') #winner
+		features = list()
+		feature_names = list()
+
+		feature_names.append("Who Went First")
 		if attributes[5] == 'Radiant':
-			w.write('1.,')
+			features.append(1.0)
 		elif attributes[5] == 'Dire':
-			w.write('0.,')
+			features.append(0.0)
 		else:
-			w.write('-1.,') # this shouldn't happen
+			features.append(-1.0)
 
 		radiant_ban_orders = [1, 3, 9, 11, 18]
 		dire_ban_orders = [2, 4, 10, 12, 17] 
@@ -43,36 +52,45 @@ def buildExamples(input_file, output_file):
 		dire_bans = [attributes[hero_pick_indexes[x-1]] for x in dire_ban_orders]
 		dire_picks = [attributes[hero_pick_indexes[x-1]] for x in dire_pick_orders]
 
+		radiant_team = attributes[4]
+		dire_team = attributes[9]
+
 		features = list()
 		feature_names = list()
 
-		hfe = HeroFeatureExtractor()
-		for index, hero in enumerate(radiant_bans):
-			features.extend(hfe.extract(hero))
-			feature_names.extend(["radiant_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#		hfe = HeroFeatureExtractor()
+#		for index, hero in enumerate(radiant_bans):
+#			features.extend(hfe.extract(hero))
+#			feature_names.extend(["radiant_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#
+#		for index, hero in enumerate(radiant_picks):
+#			features.extend(hfe.extract(hero))
+#			feature_names.extend(["radiant_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#			names = zip(feature_names,features)
+#			# for name in names:
+#			#  	print str(name[0])+" "+str(name[1])
+#		for index, hero in enumerate(dire_bans):
+#			features.extend(hfe.extract(hero))
+#			feature_names.extend(["dire_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#		for index, hero in enumerate(dire_picks):
+#			features.extend(hfe.extract(hero))
+#			feature_names.extend(["dire_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#
+#		hsfe = HeroSetFeatureExtractor()
+#		features.extend(hsfe.extract(radiant_picks))
+#		feature_names.extend(["radiant_picks_%s" % x for x in hsfe.extractFeatureNames()])
+#		features.extend(hsfe.extract(radiant_bans))
+#		feature_names.extend(["radiant_bans_%s" % x for x in hsfe.extractFeatureNames()])
+#		features.extend(hsfe.extract(dire_picks))
+#		feature_names.extend(["dire_picks_%s" % x for x in hsfe.extractFeatureNames()])
+#		features.extend(hsfe.extract(dire_bans))
+#		feature_names.extend(["dire_bans_%s" % x for x in hsfe.extractFeatureNames()])
 
-		for index, hero in enumerate(radiant_picks):
-			features.extend(hfe.extract(hero))
-			feature_names.extend(["radiant_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
-			names = zip(feature_names,features)
-			# for name in names:
-			#  	print str(name[0])+" "+str(name[1])
-		for index, hero in enumerate(dire_bans):
-			features.extend(hfe.extract(hero))
-			feature_names.extend(["dire_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
-		for index, hero in enumerate(dire_picks):
-			features.extend(hfe.extract(hero))
-			feature_names.extend(["dire_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
-
-		hsfe = HeroSetFeatureExtractor()
-		features.extend(hsfe.extract(radiant_picks))
-		feature_names.extend(["radiant_picks_%s" % x for x in hsfe.extractFeatureNames()])
-		features.extend(hsfe.extract(radiant_bans))
-		feature_names.extend(["radiant_bans_%s" % x for x in hsfe.extractFeatureNames()])
-		features.extend(hsfe.extract(dire_picks))
-		feature_names.extend(["dire_picks_%s" % x for x in hsfe.extractFeatureNames()])
-		features.extend(hsfe.extract(dire_bans))
-		feature_names.extend(["dire_bans_%s" % x for x in hsfe.extractFeatureNames()])
+		tfe = TeamFeatureExtractor()
+		features.extend(tfe.extract(radiant_team))
+		feature_names.extend(["radiant_team_%s" % x for x in tfe.extractFeatureNames()])
+		features.extend(tfe.extract(dire_team))
+		feature_names.extend(["dire_team_%s" % x for x in tfe.extractFeatureNames()])
 
 		w.write(",".join(str(x) for x in features))
 		w.write('\n')
@@ -86,7 +104,7 @@ def buildExamples(input_file, output_file):
 
 def getExamples(from_file):
 	dataset = np.genfromtxt(from_file, delimiter = ',')
-	X = dataset[:,1:-1] #Rest of attributes
+	X = dataset[:,1:] #Rest of attributes
 	y = dataset[:,0] #Target
 
 	n_sample = len(X) # from plot_iris_exercise.py
@@ -112,7 +130,7 @@ def doDecisionTree(train, test, feature_names_file):
 	correct = 0
 	for result in results:
 	 	# print "Predicted"+" "+str(result[0])+" actual:"+str(result[1])
-	 	if result[0] == precog[1]:
+	 	if result[0] == result[1]:
 	 		correct += 1
 
 	accuracy = float(correct) / float(len(results))

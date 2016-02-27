@@ -3,6 +3,8 @@ import csv
 class TeamFeatureExtractor(object):
     """Extract features related to a team."""
 
+    NULL_VALUE = 0
+
     def __init__(self):
         super(TeamFeatureExtractor, self).__init__()
 
@@ -22,7 +24,10 @@ class TeamFeatureExtractor(object):
         return self.getTeamStatsNames()
 
     def getTeamStats(self, team_name_str):
-        return [self.conform(n) for n in self.team_stats[team_name_str][0:]]
+        try:
+            return [self.conform(n) for n in self.team_stats[team_name_str][0:]]
+        except KeyError:
+            return self.getTeamStatsUnknownTeam()
 
     def getTeamStatsNames(self):
         return self.team_stats["names"][1:] # now 0 is team name
@@ -31,4 +36,7 @@ class TeamFeatureExtractor(object):
         try:
             return float(value)
         except ValueError:
-            return value
+            return self.NULL_VALUE
+
+    def getTeamStatsUnknownTeam(self):
+        return [self.NULL_VALUE for n in xrange(len(self.getTeamStatsNames()))]
