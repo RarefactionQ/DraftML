@@ -3,13 +3,13 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn import datasets, svm, linear_model, tree
+from sklearn import datasets, svm, linear_model, preprocessing, tree
 from IPython.display import Image
 from sklearn.externals.six import StringIO
 
 from feature_extractors.hero_feature_extractor import HeroFeatureExtractor
 from feature_extractors.hero_set_feature_extractor import HeroSetFeatureExtractor
-from feature_extractors.oracle_feature_extractor import OracleFeatureExtractor
+from feature_extractors.team_feature_extractor import TeamFeatureExtractor
 
 INPUT_FILE_DEFAULT = 'draft.txt'
 OUTPUT_FEATURE_FILE_DEFAULT = 'Proto.csv'
@@ -52,37 +52,45 @@ def buildExamples(input_file, output_file):
 		dire_bans = [attributes[hero_pick_indexes[x-1]] for x in dire_ban_orders]
 		dire_picks = [attributes[hero_pick_indexes[x-1]] for x in dire_pick_orders]
 
-		hfe = HeroFeatureExtractor()
-		for index, hero in enumerate(radiant_bans):
-			features.extend(hfe.extract(hero))
-			feature_names.extend(["radiant_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+		radiant_team = attributes[4]
+		dire_team = attributes[9]
 
-		for index, hero in enumerate(radiant_picks):
-			features.extend(hfe.extract(hero))
-			feature_names.extend(["radiant_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
-			names = zip(feature_names,features)
-			# for name in names:
-			#  	print str(name[0])+" "+str(name[1])
-		for index, hero in enumerate(dire_bans):
-			features.extend(hfe.extract(hero))
-			feature_names.extend(["dire_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
-		for index, hero in enumerate(dire_picks):
-			features.extend(hfe.extract(hero))
-			feature_names.extend(["dire_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+		features = list()
+		feature_names = list()
 
-		hsfe = HeroSetFeatureExtractor()
-		features.extend(hsfe.extract(radiant_picks))
-		feature_names.extend(["radiant_picks_%s" % x for x in hsfe.extractFeatureNames()])
-		features.extend(hsfe.extract(radiant_bans))
-		feature_names.extend(["radiant_bans_%s" % x for x in hsfe.extractFeatureNames()])
-		features.extend(hsfe.extract(dire_picks))
-		feature_names.extend(["dire_picks_%s" % x for x in hsfe.extractFeatureNames()])
-		features.extend(hsfe.extract(dire_bans))
-		feature_names.extend(["dire_bans_%s" % x for x in hsfe.extractFeatureNames()])
+#		hfe = HeroFeatureExtractor()
+#		for index, hero in enumerate(radiant_bans):
+#			features.extend(hfe.extract(hero))
+#			feature_names.extend(["radiant_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#
+#		for index, hero in enumerate(radiant_picks):
+#			features.extend(hfe.extract(hero))
+#			feature_names.extend(["radiant_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#			names = zip(feature_names,features)
+#			# for name in names:
+#			#  	print str(name[0])+" "+str(name[1])
+#		for index, hero in enumerate(dire_bans):
+#			features.extend(hfe.extract(hero))
+#			feature_names.extend(["dire_ban_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#		for index, hero in enumerate(dire_picks):
+#			features.extend(hfe.extract(hero))
+#			feature_names.extend(["dire_pick_%s:%s" % (index, x) for x in hfe.extractFeatureNames()])
+#
+#		hsfe = HeroSetFeatureExtractor()
+#		features.extend(hsfe.extract(radiant_picks))
+#		feature_names.extend(["radiant_picks_%s" % x for x in hsfe.extractFeatureNames()])
+#		features.extend(hsfe.extract(radiant_bans))
+#		feature_names.extend(["radiant_bans_%s" % x for x in hsfe.extractFeatureNames()])
+#		features.extend(hsfe.extract(dire_picks))
+#		feature_names.extend(["dire_picks_%s" % x for x in hsfe.extractFeatureNames()])
+#		features.extend(hsfe.extract(dire_bans))
+#		feature_names.extend(["dire_bans_%s" % x for x in hsfe.extractFeatureNames()])
 
-		ofe = OracleFeatureExtractor()
-		features.extend(ofe.extract(int(attributes[0])))
-		feature_names.extend(ofe.extractFeatureNames())
+		tfe = TeamFeatureExtractor()
+		features.extend(tfe.extract(radiant_team))
+		feature_names.extend(["radiant_team_%s" % x for x in tfe.extractFeatureNames()])
+		features.extend(tfe.extract(dire_team))
+		feature_names.extend(["dire_team_%s" % x for x in tfe.extractFeatureNames()])
 
 		w.write(",".join(str(x) for x in features))
 		w.write('\n')
